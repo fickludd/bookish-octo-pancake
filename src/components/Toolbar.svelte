@@ -1,11 +1,10 @@
 <script>
   import Tool from './Tool.svelte';
-  import { tools } from '$lib/tools';
   
-  let { activeTool, setActiveTool } = $props();
+  let { activeToolName, setActiveTool, tools, updateTool } = $props();
   
   $effect(() => {
-    console.log('Toolbar - Active tool changed:', activeTool);
+    console.log('Toolbar - Active tool changed:', activeToolName);
   });
 </script>
 
@@ -15,8 +14,10 @@
       <Tool 
         name={tool.name}
         icon={tool.icon}
-        active={activeTool === tool.name}
-        on:click={() => {setActiveTool(tool.name);}}
+        active={activeToolName === tool.name}
+        {tool}
+        on:click={() => setActiveTool(tool.name)}
+        {updateTool}
       />
     {/each}
   </div>

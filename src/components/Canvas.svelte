@@ -1,7 +1,6 @@
 <script>
-  import { tools } from '$lib/tools';
   
-  let { activeTool, width, height } = $props();
+  let { activeTool, tools, width, height } = $props();
   
   let canvas = $state();
   let context = $state();
@@ -28,7 +27,7 @@
     bind:this={canvas}
     onpointerdown={(e) => {
       coords = { x: e.offsetX, y: e.offsetY };
-      const tool = tools[activeTool];
+      const tool = activeTool;
       console.log('Canvas - Using tool:', tool);
       // Draw initial point
       context.fillStyle = tool.color;
@@ -45,8 +44,8 @@
 
       if (e.buttons === 1) {
         e.preventDefault();
-        const tool = tools[activeTool];
-        tool.draw(context, previous, coords);
+        const tool = activeTool;
+        tool.draw(tool,context, previous, coords);
       }
     }}
   ></canvas>
