@@ -2,19 +2,24 @@
 	import Canvas from '../components/Canvas.svelte';
 	import Toolbar from '../components/Toolbar.svelte';
 
-	const canvasWidth = 1200;
-	const canvasHeight = 800;
+	let canvasWidth = $state(480);
+	let canvasHeight = $state(480);
 
 	const colors = ['black', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'white', 'black'];
 
 	let activeTool = $state('brush');
   	let selected = $state(colors[0]);
   	let size = $state(10);
+
+	function setActiveTool(tool) {
+		activeTool = tool;
+	}
+
 </script>
 
 <main>
-	<Canvas width={canvasWidth} height={canvasHeight} size={size} color={selected} activeTool={activeTool} />
-	<Toolbar activeTool={activeTool} />
+	<Canvas activeTool={activeTool} width={canvasWidth} height={canvasHeight} />
+	<Toolbar {activeTool} {setActiveTool} />
 </main>
 
 <style>
