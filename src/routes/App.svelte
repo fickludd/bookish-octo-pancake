@@ -28,6 +28,7 @@
 		{ id: '1', name: 'Layer 1', visible: true, color: layerColors[0] }
 	]);
 	let activeLayerId = $state('1');
+	let layerNextId = 2;
 
 	function setActiveTool(toolName) {
 		activeToolName = toolName;
@@ -48,8 +49,9 @@
 	}
 
 	function handleLayerAdd() {
-		const newId = String(layers.length + 1);
-		const colorIndex = (layers.length) % layerColors.length;
+		const newIdInt = layerNextId++;
+		const newId = String(newIdInt);
+		const colorIndex = (newIdInt) % layerColors.length;
 		layers = [...layers, { 
 			id: newId, 
 			name: `Layer ${newId}`, 
