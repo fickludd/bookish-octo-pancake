@@ -1,20 +1,73 @@
 <script>
+  let { activeTool, tools, width, height, layers, activeLayerId } = $props();
   
-  let { activeTool, tools, width, height } = $props();
-  
-  let canvas = $state();
-  let context = $state();
+  let mainCanvas = $state();
+  let mainContext = $state();
   let coords = $state();
+  let layerCanvases = $state(new Map());
+  let containerRect = $state();
   
   $effect(() => {
-    context = canvas.getContext('2d');
+    mainContext = mainCanvas.getContext('2d');
     resize();
   });
   
   function resize() {
-    canvas.width = width;
-    canvas.height = height;
+    mainCanvas.width = width;
+    mainCanvas.height = height;
+    
+    // Update container rect for positioning
+    const container = document.querySelector('.canvas-container');
+    if (container) {
+      containerRect = container.getBoundingClientRect();
+    }
+    
+    // Resize all layer canvases
+    layerCanvases.forEach((layerCanvas) => {
+      layerCanvas.width = width;
+      layerCanvas.height = height;
+    });
   }
+  
+  function getOrCreateLayerCanvas(layerId) {
+    if (!layerCanvases.has(layerId)) {
+      const layerCanvas = document.createElement('canvas');
+      layerCanvas.width = width;
+      layerCanvas.height = height;
+      layerCanvas.style.position = 'absolute';
+      
+      // Calculate position to center the canvas
+      const left = (containerRect.width - width) / 2;
+      const top = (containerRect.height - height) / 2;
+      
+      layerCanvas.style.left = `${left}px`;
+      layerCanvas.style.top = `${top}px`;
+      layerCanvas.style.pointerEvents = 'none';
+      layerCanvases.set(layerId, layerCanvas);
+      
+      // Add the canvas to the DOM
+      const container = document.querySelector('.canvas-container');
+      if (container) {
+        container.appendChild(layerCanvas);
+      }
+    }
+    return layerCanvases.get(layerId);
+  }
+  
+  function drawAllLayers() {
+    mainContext.clearRect(0, 0, width, height);
+    
+    layers.forEach(layer => {
+      if (layer.visible) {
+        const layerCanvas = getOrCreateLayerCanvas(layer.id);
+        mainContext.drawImage(layerCanvas, 0, 0);
+      }
+    });
+  }
+  
+  $effect(() => {
+    drawAllLayers();
+  });
   
   let isDrawing = false;
 </script>
@@ -24,16 +77,21 @@
 
 <div class="canvas-container">
   <canvas
-    bind:this={canvas}
+    bind:this={mainCanvas}
     onpointerdown={(e) => {
       coords = { x: e.offsetX, y: e.offsetY };
       const tool = activeTool;
-      console.log('Canvas - Using tool:', tool);
+      const layerCanvas = getOrCreateLayerCanvas(activeLayerId);
+      const layerContext = layerCanvas.getContext('2d');
+      const activeLayer = layers.find(l => l.id === activeLayerId);
+      
       // Draw initial point
-      context.fillStyle = tool.color;
-      context.beginPath();
-      context.arc(coords.x, coords.y, tool.size / 2, 0, 2 * Math.PI);
-      context.fill();
+      layerContext.fillStyle = activeLayer.color;
+      layerContext.beginPath();
+      layerContext.arc(coords.x, coords.y, tool.size / 2, 0, 2 * Math.PI);
+      layerContext.fill();
+      
+      drawAllLayers();
     }}
     onpointerleave={() => {
       coords = null;
@@ -45,7 +103,17 @@
       if (e.buttons === 1) {
         e.preventDefault();
         const tool = activeTool;
-        tool.draw(tool,context, previous, coords);
+        const layerCanvas = getOrCreateLayerCanvas(activeLayerId);
+        const layerContext = layerCanvas.getContext('2d');
+        const activeLayer = layers.find(l => l.id === activeLayerId);
+        
+        // Override the tool's color with the layer's color
+        const originalColor = tool.color;
+        tool.color = activeLayer.color;
+        tool.draw(tool, layerContext, previous, coords);
+        tool.color = originalColor;
+        
+        drawAllLayers();
       }
     }}
   ></canvas>
@@ -59,6 +127,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
   }
 
   canvas {

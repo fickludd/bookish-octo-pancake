@@ -1,0 +1,40 @@
+query (
+        $activityId: ID!
+        $activityType: ID
+        $strict: Boolean
+        $timePeriod: ID
+        $details_V2: [DetailInput_V2!]!  ) {
+        emissionFactorGroups(
+          activityType: $activityType
+          timePeriod: $timePeriod
+          strict: $strict
+          details: []
+          details_V2: $details_V2
+        ) {
+           basis      
+           emissionFactors {        
+             score        
+             subScores {key          score        }
+             emissionFactor {          
+                id          
+                name          
+                altName
+                id2050
+                inputDetailKey
+                inputDetailId
+                activityPattern {
+                  timePeriod {name}
+                }
+                restriction {
+                  isRestricted
+                  resourceGroup
+                  message
+                }
+              }
+            }
+            }    
+            defaultValues: activity(id: $activityId) {
+              location: emissions(basis: LOCATION) {
+                calculationMethod {
+                  name          emissionFactor {            id            name            altName            id2050            inputDetailKey            inputDetailId            restriction {              isRestricted              resourceGroup              message            }            activityPattern {              timePeriod {                name              }            }          }        }        emissions {          reportingCategory {            name            number            scope {              name              number            }          }          CO2e        }      }      market: emissions(basis: MARKET) {        calculationMethod {          name          emissionFactor {            id            name            altName            id2050            inputDetailKey            inputDetailId            restriction {              isRestricted              resourceGroup              message            }            activityPattern {              timePeriod {                name              }            }          }        }        emissions {          reportingCategory {            name            number            scope {              name              number            }          }          CO2e        }      }    }  }
+    
