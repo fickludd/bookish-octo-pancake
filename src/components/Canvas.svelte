@@ -48,7 +48,7 @@
       // Add the canvas to the DOM
       const container = document.querySelector('.canvas-container');
       if (container) {
-        container.appendChild(layerCanvas);
+        //container.appendChild(layerCanvas);
       }
     }
     return layerCanvases.get(layerId);
@@ -56,16 +56,24 @@
   
   function drawAllLayers() {
     mainContext.clearRect(0, 0, width, height);
+    console.log('drawAllLayers', $state.snapshot(layers));
+
     
+    // Draw layers in order, respecting visibility
     layers.forEach(layer => {
       if (layer.visible) {
         const layerCanvas = getOrCreateLayerCanvas(layer.id);
         mainContext.drawImage(layerCanvas, 0, 0);
+        console.log('layer visible', layer.id);
+      } else {
+        console.log('layer not visible', layer.id);
       }
     });
   }
   
+  // Redraw when layers or their visibility changes
   $effect(() => {
+    layers;
     drawAllLayers();
   });
   
