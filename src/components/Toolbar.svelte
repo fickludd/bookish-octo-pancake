@@ -40,7 +40,7 @@
     height: 60px;
     background-color: #34495e;
     position: fixed;
-    bottom: 0;
+    bottom: 40px;
     left: 0;
     display: flex;
     align-items: center;

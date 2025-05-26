@@ -1,7 +1,9 @@
 <script>
 	import Canvas from '../components/Canvas.svelte';
 	import Toolbar from '../components/Toolbar.svelte';
+	import CommandHistoryBar from '../components/CommandHistoryBar.svelte';
 	import { tools as initialTools } from '$lib/tools';
+	import { CommandHistoryManager } from '../commands/CommandHistoryManager.js';
 
 	let canvasWidth = $state(480);
 	let canvasHeight = $state(480);
@@ -29,6 +31,10 @@
 	]);
 	let activeLayerId = $state('1');
 	let layerNextId = 2;
+
+
+	let commandHistory = $state([])
+	let commandHistoryManager = new CommandHistoryManager(layers, commandHistory);
 
 	function setActiveTool(toolName) {
 		activeToolName = toolName;
@@ -77,15 +83,23 @@
 		);
 	}
 
-	$inspect(tools);
+	function addCommand(command) {
+		if (command) {
+			console.log("cmd: ", command.label)
+			//commandHistory.addCommand(command);
+			commandHistory.push(command)
+		}
+	}
+
+	//$inspect(tools);
 	$inspect(activeToolName);
-	$inspect(activeTool);
-	$inspect(layers);
+	//$inspect(activeTool);
+	//$inspect(layers);
 	$inspect(activeLayerId);
 </script>
 
 <main>
-	<Canvas {activeTool} {tools} width={canvasWidth} height={canvasHeight} {layers} {activeLayerId} />
+	<Canvas {activeTool} {tools} width={canvasWidth} height={canvasHeight} {layers} {activeLayerId} {addCommand} />
 	<Toolbar 
 		{activeToolName} 
 		setActiveTool={setActiveTool} 
@@ -98,6 +112,7 @@
 		onLayerDelete={handleLayerDelete}
 		onLayerVisibilityToggle={handleLayerVisibilityToggle}
 	/>
+	<CommandHistoryBar {commandHistory} />
 </main>
 
 <style>
