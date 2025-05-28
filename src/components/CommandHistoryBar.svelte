@@ -1,10 +1,20 @@
 <script>
     export let commandHistory = [];
+    export let currentCommandIndex = -1;
+    export let onCommandClick = (index) => {};
+
+    function handleCommandClick(index) {
+        onCommandClick(index);
+    }
 </script>
 
 <div class="command-history-bar">
-    {#each commandHistory as command}
-        <div class="command-box">
+    {#each commandHistory as command, index}
+        <div 
+            class="command-box" 
+            class:unapplied={index > currentCommandIndex}
+            on:click={() => handleCommandClick(index)}
+        >
             <div class="layer-indicator" style="background-color: {command.layer.color}"></div>
             <span class="command-label">{command.label}</span>
         </div>
@@ -39,6 +49,16 @@
         display: flex;
         align-items: center;
         gap: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .command-box:hover {
+        background-color: #2c3e50;
+    }
+
+    .command-box.unapplied {
+        opacity: 0.5;
     }
 
     .layer-indicator {

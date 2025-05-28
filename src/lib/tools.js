@@ -35,14 +35,12 @@ function endMouseDrawCommand(self, activeLayer) {
   if (self.steps.length == 0) {
     return null;
   }
-
-
-  console.log("endMouseDrawCommand", activeLayer)
   
   const command = {
     label: self.name + " draw",
     layer: activeLayer,
-    applyCommand: (context) => {
+    steps: self.steps,
+    applyCommand: (self, context) => {
       self.steps.forEach(step => step.applyStep(context));
     }
   }

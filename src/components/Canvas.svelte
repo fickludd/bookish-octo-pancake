@@ -1,10 +1,11 @@
 <script>
-  let { activeTool, tools, width, height, layers, activeLayerId, addCommand } = $props();
+  import { getOrCreateLayerCanvas, resize as resizeCanvas } from '$lib/canvasState';
+  
+  let { activeTool, width, height, layers, activeLayerId, addCommand, redrawTrigger } = $props();
   
   let mainCanvas = $state();
   let mainContext = $state();
   let coords = $state();
-  let layerCanvases = $state(new Map());
   let containerRect = $state();
   
   $effect(() => {
@@ -22,36 +23,7 @@
       containerRect = container.getBoundingClientRect();
     }
     
-    // Resize all layer canvases
-    layerCanvases.forEach((layerCanvas) => {
-      layerCanvas.width = width;
-      layerCanvas.height = height;
-    });
-  }
-  
-  function getOrCreateLayerCanvas(layerId) {
-    if (!layerCanvases.has(layerId)) {
-      const baseCanvas = createLayerCanvas();
-      const latestCanvas = createLayerCanvas();
-      layerCanvases.set(layerId, {base: baseCanvas, latest: latestCanvas});
-    }
-    return layerCanvases.get(layerId);
-  }
-
-  function createLayerCanvas() {
-    const layerCanvas = document.createElement('canvas');
-    layerCanvas.width = width;
-    layerCanvas.height = height;
-    layerCanvas.style.position = 'absolute';
-    
-    // Calculate position to center the canvas
-    const left = (containerRect.width - width) / 2;
-    const top = (containerRect.height - height) / 2;
-    
-    layerCanvas.style.left = `${left}px`;
-    layerCanvas.style.top = `${top}px`;
-    layerCanvas.style.pointerEvents = 'none';
-    return layerCanvas;
+    resizeCanvas(width, height);
   }
   
   function drawAllLayers() {
@@ -61,6 +33,9 @@
     layers.forEach(layer => {
       if (layer.visible) {
         const { base, latest } = getOrCreateLayerCanvas(layer.id);
+        // Draw the base canvas first (contains all applied commands)
+        mainContext.drawImage(base, 0, 0);
+        // Then draw the latest canvas on top (contains any in-progress drawing)
         mainContext.drawImage(latest, 0, 0);
       }
     });
@@ -77,12 +52,15 @@
     layers;
     drawAllLayers();
   });
+
+  // Redraw when redrawTrigger changes
+  $effect(() => {
+    redrawTrigger;
+    drawAllLayers();
+  });
   
   let isDrawing = false;
 </script>
-
-
-<!--svelte:window onresize={resize} /-->
 
 <div class="canvas-container">
   <canvas

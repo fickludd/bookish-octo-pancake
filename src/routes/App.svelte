@@ -3,7 +3,7 @@
 	import Toolbar from '../components/Toolbar.svelte';
 	import CommandHistoryBar from '../components/CommandHistoryBar.svelte';
 	import { tools as initialTools } from '$lib/tools';
-	import { CommandHistoryManager } from '../commands/CommandHistoryManager.js';
+	import { clearCanvases, replayCommands, resize } from '$lib/canvasState';
 
 	let canvasWidth = $state(480);
 	let canvasHeight = $state(480);
@@ -32,9 +32,13 @@
 	let activeLayerId = $state('1');
 	let layerNextId = 2;
 
-
 	let commandHistory = $state([])
-	let commandHistoryManager = new CommandHistoryManager(layers, commandHistory);
+	let currentCommandIndex = $state(-1);
+	let redrawTrigger = $state(0);
+
+	$effect(() => {
+		resize(canvasWidth, canvasHeight);
+	});
 
 	function setActiveTool(toolName) {
 		activeToolName = toolName;
@@ -83,11 +87,38 @@
 		);
 	}
 
+	function handleCommandClick(index) {
+		if (index === currentCommandIndex) {
+			// If clicking the current command, rewind to before it
+			rewindToCommand(index - 1);
+		} else if (index < currentCommandIndex) {
+			// If clicking a command before current, rewind to it
+			rewindToCommand(index);
+		} else {
+			// If clicking a command after current, forward to it
+			forwardToCommand(index);
+		}
+	}
+
+	function rewindToCommand(targetIndex) {
+		clearCanvases();
+		replayCommands(commandHistory, 0, targetIndex);
+		currentCommandIndex = targetIndex;
+		redrawTrigger++;
+	}
+
+	function forwardToCommand(targetIndex) {
+		replayCommands(commandHistory, currentCommandIndex + 1, targetIndex);
+		currentCommandIndex = targetIndex;
+		redrawTrigger++;
+	}
+
 	function addCommand(command) {
 		if (command) {
-			console.log("cmd: ", command.label)
-			//commandHistory.addCommand(command);
-			commandHistory.push(command)
+			// Discard any commands after the current index
+			const appliedHistory = commandHistory.slice(0, currentCommandIndex + 1);
+			commandHistory = [...appliedHistory, command];
+			currentCommandIndex = commandHistory.length - 1;
 		}
 	}
 
@@ -99,7 +130,15 @@
 </script>
 
 <main>
-	<Canvas {activeTool} {tools} width={canvasWidth} height={canvasHeight} {layers} {activeLayerId} {addCommand} />
+	<Canvas 
+		{activeTool}
+		width={canvasWidth} 
+		height={canvasHeight} 
+		{layers} 
+		{activeLayerId} 
+		{addCommand}
+		{redrawTrigger}
+	/>
 	<Toolbar 
 		{activeToolName} 
 		setActiveTool={setActiveTool} 
@@ -112,7 +151,11 @@
 		onLayerDelete={handleLayerDelete}
 		onLayerVisibilityToggle={handleLayerVisibilityToggle}
 	/>
-	<CommandHistoryBar {commandHistory} />
+	<CommandHistoryBar 
+		{commandHistory} 
+		{currentCommandIndex}
+		onCommandClick={handleCommandClick}
+	/>
 </main>
 
 <style>
