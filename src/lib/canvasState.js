@@ -32,13 +32,19 @@ export function clearCanvases() {
 }
 
 export function replayCommands(commands, startIndex, endIndex) {
-  for (let i = 0; i <= endIndex; i++) {
-    const command = commands[i];
-    const {base, latest} = getOrCreateLayerCanvas(command.layer.id);
+  // First, copy the base state to the latest canvas for each layer
+  layerCanvases.forEach(({base, latest}) => {
     const baseContext = base.getContext('2d');
     const latestContext = latest.getContext('2d');
-    
-    // Apply to both base and latest
+    latestContext.clearRect(0, 0, width, height);
+    latestContext.drawImage(base, 0, 0);
+  });
+
+  // Then replay commands on top of the latest canvas
+  for (let i = 0; i <= endIndex; i++) {
+    const command = commands[i];
+    const {latest} = getOrCreateLayerCanvas(command.layer.id);
+    const latestContext = latest.getContext('2d');
     command.applyCommand(command, latestContext);
   }
 }
@@ -54,4 +60,46 @@ export function resize(newWidth, newHeight) {
     latest.width = width;
     latest.height = height;
   });
-} 
+}
+
+export function saveCanvasState() {
+  const state = {
+    width,
+    height,
+    layers: Array.from(layerCanvases.entries()).map(([layerId, {base, latest}]) => ({
+      layerId,
+      image: latest.toDataURL()
+    }))
+  };
+  return state;
+}
+
+export function loadCanvasState(state) {
+  // Clear existing state
+  clearCanvases();
+  
+  // Update dimensions
+  width = state.width;
+  height = state.height;
+  
+  // Create a promise for each layer's loading
+  const loadPromises = state.layers.map(({layerId, image}) => {
+    return new Promise((resolve) => {
+      const {base, latest} = getOrCreateLayerCanvas(layerId);
+      
+      // Load base image
+      const baseImg = new Image();
+      baseImg.onload = () => {
+        const ctx = base.getContext('2d');
+        ctx.drawImage(baseImg, 0, 0);
+        resolve();
+      };
+      baseImg.src = image;
+    });
+  });
+
+  // Wait for all layers to load
+  return Promise.all(loadPromises).then(() => {
+
+  });
+}

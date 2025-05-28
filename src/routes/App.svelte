@@ -3,7 +3,7 @@
 	import Toolbar from '../components/Toolbar.svelte';
 	import CommandHistoryBar from '../components/CommandHistoryBar.svelte';
 	import { tools as initialTools } from '$lib/tools';
-	import { clearCanvases, replayCommands, resize } from '$lib/canvasState';
+	import { replayCommands, resize } from '$lib/canvasState';
 
 	let canvasWidth = $state(480);
 	let canvasHeight = $state(480);
@@ -101,7 +101,6 @@
 	}
 
 	function rewindToCommand(targetIndex) {
-		clearCanvases();
 		replayCommands(commandHistory, 0, targetIndex);
 		currentCommandIndex = targetIndex;
 		redrawTrigger++;
@@ -122,10 +121,15 @@
 		}
 	}
 
-	//$inspect(tools);
+	// Handle load completion
+	function handleLoadComplete() {
+		// Clear command history
+		commandHistory = [];
+		currentCommandIndex = -1;
+		redrawTrigger++;
+	}
+
 	$inspect(activeToolName);
-	//$inspect(activeTool);
-	//$inspect(layers);
 	$inspect(activeLayerId);
 </script>
 
@@ -150,6 +154,7 @@
 		onLayerAdd={handleLayerAdd}
 		onLayerDelete={handleLayerDelete}
 		onLayerVisibilityToggle={handleLayerVisibilityToggle}
+		onLoadComplete={handleLoadComplete}
 	/>
 	<CommandHistoryBar 
 		{commandHistory} 

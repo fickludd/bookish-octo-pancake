@@ -3,7 +3,7 @@ function startMouseDrawCommand(self, coords, activeLayer) {
     applyStep: (context) => {
 
       // Draw initial point
-      context.fillStyle = activeLayer.color;
+      context.fillStyle = self.color;
       context.beginPath();
       context.arc(coords.x, coords.y, self.size / 2, 0, 2 * Math.PI);
       context.fill();
@@ -18,11 +18,7 @@ function startMouseDrawCommand(self, coords, activeLayer) {
 function updateMouseDrawCommand(self, coords, previous, activeLayer) {
   const step = {
     applyStep: (context) => {
-      // Override the tool's color with the layer's color
-      const originalColor = self.color;
-      self.color = activeLayer.color;
       self.draw(self, context, previous, coords);
-      self.color = originalColor;
     }
   };
 
@@ -78,13 +74,21 @@ export const tools = {
     updateCommand: updateMouseDrawCommand,
     endCommand: endMouseDrawCommand,
     draw: (self, context, from, to) => {
-      context.strokeStyle = self.color; //'#908383';
-      context.lineWidth = self.size; //20;
+      // Save the current composite operation
+      const originalComposite = context.globalCompositeOperation;
+      // Set to destination-out to erase
+      context.globalCompositeOperation = 'destination-out';
+      
+      context.strokeStyle = 'black'; // Color doesn't matter for erasing
+      context.lineWidth = self.size;
       context.lineCap = 'round';
       context.beginPath();
       context.moveTo(from.x, from.y);
       context.lineTo(to.x, to.y);
       context.stroke();
+      
+      // Restore the original composite operation
+      context.globalCompositeOperation = originalComposite;
     }
   }
 }; 
