@@ -15,6 +15,12 @@
     }
   }
 
+  function handleOpacityChange(event) {
+    if (activeToolName === 'brush') {
+      updateTool('brush', { opacity: parseFloat(event.target.value) / 100.0 });
+    }
+  }
+
   function handleSave() {
     const state = saveCanvasState();
     const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
@@ -68,13 +74,28 @@
         on:change={handleColorChange}
         class="color-picker"
       />
-      <input 
-        type="range" 
-        min="1" 
-        max="50" 
-        value={tools.brush.size}
-        on:input={(e) => updateTool('brush', { size: parseInt(e.target.value) })}
-      />
+      <div class="sliders">
+        <div class="slider-group">
+          <label>Size</label>
+          <input 
+            type="range" 
+            min="1" 
+            max="50" 
+            value={tools.brush.size}
+            on:input={(e) => updateTool('brush', { size: parseInt(e.target.value) })}
+          />
+        </div>
+        <div class="slider-group">
+          <label>Opacity</label>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={tools.brush.opacity * 100}
+            on:input={handleOpacityChange}
+          />
+        </div>
+      </div>
     </div>
   {/if}
 
@@ -155,6 +176,24 @@
   .color-picker::-webkit-color-swatch {
     border: none;
     border-radius: 4px;
+  }
+
+  .sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .slider-group label {
+    color: #ecf0f1;
+    font-size: 12px;
+    min-width: 40px;
   }
 
   input[type="range"] {
