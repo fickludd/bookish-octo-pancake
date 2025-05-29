@@ -1,11 +1,17 @@
 function startMouseDrawCommand(self, coords, activeLayer) {
   const step = {
     applyStep: (context) => {
+
+
+      const pressure = coords.pressure || 1.0;
+      const size = self.size * pressure;
+      const opacity = self.opacity * pressure;
+
       // Draw initial point
       context.fillStyle = self.color;
-      context.globalAlpha = self.opacity;
+      context.globalAlpha = opacity;
       context.beginPath();
-      context.arc(coords.x, coords.y, self.size / 2, 0, 2 * Math.PI);
+      context.arc(coords.x, coords.y, size / 2, 0, 2 * Math.PI);
       context.fill();
       context.globalAlpha = 1.0;
     }
@@ -57,13 +63,18 @@ export const tools = {
     updateCommand: updateMouseDrawCommand,
     endCommand: endMouseDrawCommand,
     draw: (self, context, from, to) => {
+      console.log("draw", to.pressure)
+      const pressure = to.pressure || 1.0;
+      const size = self.size * pressure;
+      const opacity = self.opacity * pressure;
+
       // Calculate distance between points
       const dx = to.x - from.x;
       const dy = to.y - from.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       // Calculate number of steps based on distance
-      const steps = Math.max(1, Math.ceil(distance / (self.size / 2)));
+      const steps = Math.max(1, Math.ceil(distance / (size / 2)));
       
       // Draw interpolated points
       for (let i = 0; i <= steps; i++) {
@@ -72,9 +83,9 @@ export const tools = {
         const y = from.y + dy * t;
         
         context.fillStyle = self.color;
-        context.globalAlpha = self.opacity;
+        context.globalAlpha = opacity;
         context.beginPath();
-        context.arc(x, y, self.size / 2, 0, 2 * Math.PI);
+        context.arc(x, y, size / 2, 0, 2 * Math.PI);
         context.fill();
       }
       context.globalAlpha = 1.0;

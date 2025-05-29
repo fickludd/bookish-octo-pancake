@@ -84,7 +84,11 @@
     }}
     onpointermove={(e) => {
       const previous = coords;
-      coords = { x: e.offsetX, y: e.offsetY };
+      coords = { 
+        x: e.offsetX, 
+        y: e.offsetY, 
+        pressure: e.pointerType === 'pen' ? (e.pressure || 1.0) : 1.0 
+      };
 
       if (e.buttons === 1) {
         e.preventDefault();
