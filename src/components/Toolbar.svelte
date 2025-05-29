@@ -112,16 +112,21 @@
     justify-content: space-between;
     padding: 0 20px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    gap: 20px;
   }
 
   .tools {
     display: flex;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .right-section {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    margin-right: 20px;
   }
 
   .tool-options {
@@ -131,6 +136,7 @@
     padding: 0 10px;
     background-color: #34495e;
     border-radius: 4px;
+    flex-shrink: 0;
   }
 
   .color-picker {
@@ -172,6 +178,6 @@
   .file-actions {
     display: flex;
     gap: 10px;
-    margin-left: 20px;
+    flex-shrink: 0;
   }
 </style> 

@@ -74,8 +74,11 @@
     border-radius: 8px;
     padding: 12px;
     min-width: 200px;
+    max-width: 300px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
     margin-bottom: 8px;
+    max-height: 80vh;
+    overflow-y: auto;
   }
   
   .layer-list {
