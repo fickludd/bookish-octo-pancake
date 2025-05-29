@@ -170,6 +170,6 @@
 		margin: 0;
 		padding: 0;
 		overflow: hidden;
-		background-color: #f5f5f5;
+		background-color: #2c3e50;
 	}
 </style>

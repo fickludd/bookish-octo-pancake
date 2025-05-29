@@ -112,10 +112,14 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    padding: 0;
+    margin: 0;
   }
 
   canvas {
     background-color: #908383;
     cursor: crosshair;
+    padding: 0;
+    margin: 0;
   }
 </style> 
