@@ -3,7 +3,7 @@
   import LayerManager from './LayerManager.svelte';
   import { saveCanvasState, loadCanvasState } from '$lib/canvasState';
   
-  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange } = $props();
+  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom } = $props();
   
   $effect(() => {
     console.log('Toolbar - Active tool changed:', activeToolName);
@@ -107,6 +107,10 @@
     <button class="tool-button" on:click={handleLoad} title="Load">
       📂
     </button>
+    <button class="tool-button" on:click={zoomOut} title="Zoom out">-</button>
+    <span class="zoom-label">{Math.round(zoom * 100)}%</span>
+    <button class="tool-button" on:click={zoomIn} title="Zoom in">+</button>
+    <button class="tool-button" on:click={resetZoom} title="Reset zoom">⟳</button>
   </div>
 
   <div class="right-section">
@@ -219,5 +223,14 @@
     display: flex;
     gap: 10px;
     flex-shrink: 0;
+  }
+
+  .zoom-label {
+    color: #ecf0f1;
+    font-size: 1rem;
+    margin: 0 6px;
+    min-width: 40px;
+    text-align: center;
+    user-select: none;
   }
 </style> 

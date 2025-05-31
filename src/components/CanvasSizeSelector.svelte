@@ -4,7 +4,7 @@
 
   const presets = [
     { name: 'A4', width: 2480, height: 3508, desc: 'Print (1:1.41)' },
-    { name: 'Square', width: 2048, height: 2048, desc: '1:1' },
+    { name: 'Square', width: 1024, height: 1024, desc: '1:1' },
     { name: 'Instagram', width: 1080, height: 1350, desc: '4:5' },
     { name: 'Pinterest', width: 1000, height: 1500, desc: '2:3' },
     { name: 'LinkedIn', width: 1200, height: 627, desc: '1.91:1' },

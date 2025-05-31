@@ -38,6 +38,9 @@
 	let currentCommandIndex = $state(-1);
 	let redrawTrigger = $state(0);
 
+	let zoom = $state(1);
+	let pan = $state({ x: 0, y: 0 });
+
 	$effect(() => {
 		resize(canvasWidth, canvasHeight);
 	});
@@ -136,6 +139,23 @@
 		canvasInitialized = true;
 	}
 
+	function setZoom(newZoom) {
+		zoom = Math.max(0.1, Math.min(newZoom, 10));
+	}
+	function zoomIn() {
+		setZoom(zoom * 1.5);
+	}
+	function zoomOut() {
+		setZoom(zoom / 1.5);
+	}
+	function resetZoom() {
+		zoom = 1;
+		pan = { x: 0, y: 0 };
+	}
+	function setPan(newPan) { // canvas space
+		pan = newPan;
+	}
+
 	$inspect(activeToolName);
 	$inspect(activeLayerId);
 </script>
@@ -152,6 +172,9 @@
 			{activeLayerId} 
 			{addCommand}
 			{redrawTrigger}
+			{zoom}
+			{pan}
+			setPan={setPan}
 		/>
 		<Toolbar 
 			{activeToolName} 
@@ -166,7 +189,14 @@
 			onLayerVisibilityToggle={handleLayerVisibilityToggle}
 			onLoadComplete={handleLoadComplete}
 			onCanvasSizeChange={handleCanvasSizeSelected}
+			zoom={zoom}
+			zoomIn={zoomIn}
+			zoomOut={zoomOut}
+			resetZoom={resetZoom}
 		/>
+		<div class="zoom-indicator" on:click={resetZoom} title="Reset zoom">
+			{Math.round(zoom * 100)}%
+		</div>
 		<CommandHistoryBar 
 			{commandHistory} 
 			{currentCommandIndex}
@@ -183,5 +213,24 @@
 		padding: 0;
 		overflow: hidden;
 		background-color: #2c3e50;
+	}
+	.zoom-indicator {
+		position: fixed;
+		top: 16px;
+		right: 32px;
+		background: #34495e;
+		color: #ecf0f1;
+		padding: 6px 16px;
+		border-radius: 20px;
+		font-size: 1.1rem;
+		font-weight: 600;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+		cursor: pointer;
+		z-index: 1001;
+		user-select: none;
+		transition: background 0.15s;
+	}
+	.zoom-indicator:hover {
+		background: #2980b9;
 	}
 </style>
