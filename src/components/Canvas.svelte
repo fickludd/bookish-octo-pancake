@@ -27,17 +27,22 @@
     
     resizeCanvas(width, height);
   }
-  
+
+  function handleResize() {
+    const container = document.querySelector('.canvas-container');
+    if (container) {
+      containerRect = container.getBoundingClientRect();
+    }
+  }
+
   function drawAllLayers() {
-    //mainContext.setTransform(zoom, 0, 0, zoom, 0, 0);
-    //mainContext.clearRect(0, 0, width / zoom, height / zoom);
     mainContext.clearRect(0, 0, width, height);
     
     // Draw layers in order, respecting visibility
     layers.forEach(layer => {
       if (layer.visible) {
         const { base, latest } = getOrCreateLayerCanvas(layer.id);
-        //mainContext.drawImage(base, 0, 0);
+        mainContext.drawImage(base, 0, 0);
         mainContext.drawImage(latest, 0, 0);
       }
     });
@@ -139,10 +144,14 @@
   onMount(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('resize', handleResize);
+    // Initial container rect update
+    handleResize();
   });
   onDestroy(() => {
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);
+    window.removeEventListener('resize', handleResize);
   });
 </script>
 
@@ -156,9 +165,9 @@
       handlePointerDown(e);
       if (!spacePressed) {
         const rect = mainCanvas.getBoundingClientRect();
-        const screenX = e.clientX - rect.left;
-        const screenY = e.clientY - rect.top;
-        coords = screenToCanvas(screenX, screenY, zoom, pan);
+        const screenX = e.clientX;
+        const screenY = e.clientY;
+        coords = screenToCanvas(screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
         const { base, latest } = getOrCreateLayerCanvas(activeLayerId);
         const layerContext = latest.getContext('2d');
         const activeLayer = layers.find(l => l.id === activeLayerId);
@@ -171,10 +180,11 @@
       handlePointerMove(e);
       if (!spacePressed) {
         const rect = mainCanvas.getBoundingClientRect();
-        const screenX = e.clientX - rect.left;
-        const screenY = e.clientY - rect.top;
+        const screenX = e.clientX;
+        const screenY = e.clientY;
         const previous = coords;
-        coords = screenToCanvas(screenX, screenY, zoom, pan);
+        coords = screenToCanvas(screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
+        console.log("coords", coords, screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
         coords.pressure = e.pointerType === 'pen' ? (e.pressure || 1.0) : 1.0;
         if (e.buttons === 1) {
           e.preventDefault();
@@ -204,7 +214,7 @@
 <style>
   .canvas-container {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 100px); /* Subtract toolbar (60px) and command history (40px) heights */
     background-color: #2c3e50;
     display: flex;
     justify-content: center;
@@ -212,6 +222,7 @@
     position: relative;
     padding: 0;
     margin: 0;
+    margin-bottom: 100px; /* Add margin to prevent overlap with fixed elements */
   }
 
   canvas {

@@ -2,8 +2,11 @@
   import Tool from './Tool.svelte';
   import LayerManager from './LayerManager.svelte';
   import { saveCanvasState, loadCanvasState } from '$lib/canvasState';
+  import { onMount, onDestroy } from 'svelte';
   
   let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom } = $props();
+  
+  let showFileMenu = $state(false);
   
   $effect(() => {
     console.log('Toolbar - Active tool changed:', activeToolName);
@@ -30,6 +33,7 @@
     a.download = 'canvas-state.json';
     a.click();
     URL.revokeObjectURL(url);
+    showFileMenu = false;
   }
 
   async function handleLoad() {
@@ -50,7 +54,44 @@
       }
     };
     input.click();
+    showFileMenu = false;
   }
+
+  function handleExportPNG() {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+    
+    const link = document.createElement('a');
+    link.download = 'canvas-export.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showFileMenu = false;
+  }
+
+  function handleExportJPEG() {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+    
+    const link = document.createElement('a');
+    link.download = 'canvas-export.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.9);
+    link.click();
+    showFileMenu = false;
+  }
+
+  function handleClickOutside(event) {
+    if (!event.target.closest('.file-menu')) {
+      showFileMenu = false;
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener('click', handleClickOutside);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
 </script>
 
 <div class="toolbar">
@@ -101,12 +142,20 @@
   {/if}
 
   <div class="file-actions">
-    <button class="tool-button" on:click={handleSave} title="Save">
-      💾
-    </button>
-    <button class="tool-button" on:click={handleLoad} title="Load">
-      📂
-    </button>
+    <div class="file-menu">
+      <button class="tool-button" on:click={() => showFileMenu = !showFileMenu} title="File operations">
+        📁
+      </button>
+      {#if showFileMenu}
+        <div class="file-dropdown">
+          <button on:click={handleSave}>Save Project</button>
+          <button on:click={handleLoad}>Load Project</button>
+          <div class="separator"></div>
+          <button on:click={handleExportPNG}>Export as PNG</button>
+          <button on:click={handleExportJPEG}>Export as JPEG</button>
+        </div>
+      {/if}
+    </div>
     <button class="tool-button" on:click={zoomOut} title="Zoom out">-</button>
     <span class="zoom-label">{Math.round(zoom * 100)}%</span>
     <button class="tool-button" on:click={zoomIn} title="Zoom in">+</button>
@@ -223,6 +272,7 @@
     display: flex;
     gap: 10px;
     flex-shrink: 0;
+    align-items: center;
   }
 
   .zoom-label {
@@ -232,5 +282,43 @@
     min-width: 40px;
     text-align: center;
     user-select: none;
+  }
+
+  .file-menu {
+    position: relative;
+  }
+
+  .file-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    padding: 8px 0;
+    min-width: 160px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 8px;
+  }
+
+  .file-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: #ecf0f1;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .file-dropdown button:hover {
+    background-color: #34495e;
+  }
+
+  .separator {
+    height: 1px;
+    background-color: #34495e;
+    margin: 8px 0;
   }
 </style> 

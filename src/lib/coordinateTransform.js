@@ -4,45 +4,73 @@
 
 /**
  * Convert screen coordinates to canvas coordinates
- * @param {number} screenX - X coordinate in screen space
- * @param {number} screenY - Y coordinate in screen space
+ * @param {number} screenX - X coordinate in screen space (top-left origin)
+ * @param {number} screenY - Y coordinate in screen space (top-left origin)
+ * @param {number} viewportWidth - Width of the viewport (container)
+ * @param {number} viewportHeight - Height of the viewport (container)
  * @param {number} canvasWidth - Width of the canvas
  * @param {number} canvasHeight - Height of the canvas
  * @param {number} zoom - Current zoom level
  * @param {{x: number, y: number}} pan - Current pan offset
- * @returns {{x: number, y: number}} Coordinates in canvas space
+ * @returns {{x: number, y: number}} Coordinates in canvas space (top-left origin)
  */
-export function screenToCanvas(screenX, screenY, zoom, pan) {
-    // First remove the pan offset
-    const xWithoutPan = screenX - pan.x;
-    const yWithoutPan = screenY - pan.y;
-    
-    // Then remove the zoom scaling
+export function screenToCanvas(screenX, screenY, viewportWidth, viewportHeight, canvasWidth, canvasHeight, zoom, pan) {
+    // 1. Convert screen coordinates to center-origin coordinates (using viewport size)
+    const viewportCenterX = viewportWidth / 2;
+    const viewportCenterY = viewportHeight / 2;
+    const centeredScreenX = screenX - viewportCenterX;
+    const centeredScreenY = screenY - viewportCenterY;
+
+    // 2. Remove zoom scaling
+    const unzoomedX = centeredScreenX / zoom;
+    const unzoomedY = centeredScreenY / zoom;
+
+    // 3. Remove pan offset
+    const unzoomedUnpannedX = unzoomedX - pan.x;
+    const unzoomedUnpannedY = unzoomedY - pan.y;
+
+    // 4. Convert to canvas coordinates (using canvas size)
+    const canvasCenterX = canvasWidth / 2;
+    const canvasCenterY = canvasHeight / 2;
     return {
-        x: xWithoutPan / zoom,
-        y: yWithoutPan / zoom
+        x: unzoomedUnpannedX + canvasCenterX,
+        y: unzoomedUnpannedY + canvasCenterY
     };
 }
 
 /**
  * Convert canvas coordinates to screen coordinates
- * @param {number} canvasX - X coordinate in canvas space
- * @param {number} canvasY - Y coordinate in canvas space
+ * @param {number} canvasX - X coordinate in canvas space (top-left origin)
+ * @param {number} canvasY - Y coordinate in canvas space (top-left origin)
+ * @param {number} viewportWidth - Width of the viewport (container)
+ * @param {number} viewportHeight - Height of the viewport (container)
  * @param {number} canvasWidth - Width of the canvas
  * @param {number} canvasHeight - Height of the canvas
  * @param {number} zoom - Current zoom level
  * @param {{x: number, y: number}} pan - Current pan offset
- * @returns {{x: number, y: number}} Coordinates in screen space
+ * @returns {{x: number, y: number}} Coordinates in screen space (top-left origin)
  */
-export function canvasToScreen(canvasX, canvasY, zoom, pan) {
-    // First apply zoom scaling
-    const xWithZoom = canvasX * zoom;
-    const yWithZoom = canvasY * zoom;
-    
-    // Then add the pan offset
+export function canvasToScreen(canvasX, canvasY, viewportWidth, viewportHeight, canvasWidth, canvasHeight, zoom, pan) {
+    // 1. Convert canvas coordinates to center-origin coordinates (using canvas size)
+    const canvasCenterX = canvasWidth / 2;
+    const canvasCenterY = canvasHeight / 2;
+    const centeredCanvasX = canvasX - canvasCenterX;
+    const centeredCanvasY = canvasY - canvasCenterY;
+
+    // 2. Apply pan offset
+    const pannedX = centeredCanvasX + pan.x;
+    const pannedY = centeredCanvasY + pan.y;
+
+    // 3. Apply zoom scaling
+    const zoomedX = pannedX * zoom;
+    const zoomedY = pannedY * zoom;
+
+    // 4. Convert to screen coordinates (using viewport size)
+    const viewportCenterX = viewportWidth / 2;
+    const viewportCenterY = viewportHeight / 2;
     return {
-        x: xWithZoom + pan.x,
-        y: yWithZoom + pan.y
+        x: zoomedX + viewportCenterX,
+        y: zoomedY + viewportCenterY
     };
 }
 
