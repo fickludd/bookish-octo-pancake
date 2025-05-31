@@ -151,8 +151,8 @@
     bind:this={mainCanvas}
     width={width}
     height={height}
-    on:wheel={handleWheel}
-    on:pointerdown={(e) => {
+    onwheel={handleWheel}
+    onpointerdown={(e) => {
       handlePointerDown(e);
       if (!spacePressed) {
         const rect = mainCanvas.getBoundingClientRect();
@@ -167,7 +167,7 @@
         drawAllLayers();
       }
     }}
-    on:pointermove={(e) => {
+    onpointermove={(e) => {
       handlePointerMove(e);
       if (!spacePressed) {
         const rect = mainCanvas.getBoundingClientRect();
@@ -189,11 +189,11 @@
         }
       }
     }}
-    on:pointerup={() => {
+    onpointerup={() => {
       handlePointerUp();
       if (!spacePressed) endCommand();
     }}
-    on:pointerleave={() => {
+    onpointerleave={() => {
       coords = null;
       handlePointerUp();
     }}
