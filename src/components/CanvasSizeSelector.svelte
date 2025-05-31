@@ -28,21 +28,47 @@
     <h2>Select Canvas Size</h2>
     <div class="preset-grid">
       {#each presets as preset}
-        <button class="preset-btn" on:click={() => selectPreset(preset)}>
+        <button 
+          class="preset-btn" 
+          on:click={() => selectPreset(preset)}
+          title={`${preset.name} (${preset.width} × ${preset.height})`}
+        >
           <div class="preset-name">{preset.name}</div>
           <div class="preset-desc">{preset.width} × {preset.height} <span>({preset.desc})</span></div>
         </button>
       {/each}
     </div>
     <div class="custom-row">
-      <button class="custom-btn" on:click={() => showCustom = !showCustom}>
+      <button 
+        class="custom-btn" 
+        on:click={() => showCustom = !showCustom}
+        title="Set custom canvas dimensions"
+      >
         Custom…
       </button>
       {#if showCustom}
         <div class="custom-fields">
-          <input type="number" min="64" max="8192" bind:value={customWidth} /> ×
-          <input type="number" min="64" max="8192" bind:value={customHeight} />
-          <button class="ok-btn" on:click={selectCustom}>OK</button>
+          <input 
+            type="number" 
+            min="64" 
+            max="8192" 
+            bind:value={customWidth}
+            title="Canvas width (64-8192 pixels)"
+          /> ×
+          <input 
+            type="number" 
+            min="64" 
+            max="8192" 
+            bind:value={customHeight}
+            title="Canvas height (64-8192 pixels)"
+          />
+          <button 
+            class="ok-btn" 
+            on:click={selectCustom}
+            title="Create canvas with custom dimensions"
+          >
+            OK
+          </button>
         </div>
       {/if}
     </div>
