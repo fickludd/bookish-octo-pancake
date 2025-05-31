@@ -13,11 +13,11 @@
 </script>
 
 <div class="tool" class:active>
-  <div class="tool-content" on:click>
+  <div class="tool-content" on:click title={`${name.charAt(0).toUpperCase() + name.slice(1)} Tool`}>
     <span class="icon">{icon}</span>
     <span class="name">{name}</span>
   </div>
-  <button class="settings-button" on:click|stopPropagation={() => showSettings = true}>
+  <button class="settings-button" on:click|stopPropagation={() => showSettings = true} title={`${name.charAt(0).toUpperCase() + name.slice(1)} Settings`}>
     ⚙️
   </button>
 </div>

@@ -104,6 +104,7 @@
         {tool}
         on:click={() => setActiveTool(tool.name)}
         {updateTool}
+        title={tool.name.charAt(0).toUpperCase() + tool.name.slice(1)}
       />
     {/each}
   </div>
@@ -115,6 +116,7 @@
         value={tools.brush.color}
         on:change={handleColorChange}
         class="color-picker"
+        title="Brush Color"
       />
       <div class="sliders">
         <div class="slider-group">
@@ -125,6 +127,7 @@
             max="50" 
             value={tools.brush.size}
             on:input={(e) => updateTool('brush', { size: parseInt(e.target.value) })}
+            title="Brush Size"
           />
         </div>
         <div class="slider-group">
@@ -135,6 +138,7 @@
             max="100" 
             value={tools.brush.opacity * 100}
             on:input={handleOpacityChange}
+            title="Brush Opacity"
           />
         </div>
       </div>
@@ -148,18 +152,18 @@
       </button>
       {#if showFileMenu}
         <div class="file-dropdown">
-          <button on:click={handleSave}>Save Project</button>
-          <button on:click={handleLoad}>Load Project</button>
+          <button on:click={handleSave} title="Save your current project">Save Project</button>
+          <button on:click={handleLoad} title="Load a previously saved project">Load Project</button>
           <div class="separator"></div>
-          <button on:click={handleExportPNG}>Export as PNG</button>
-          <button on:click={handleExportJPEG}>Export as JPEG</button>
+          <button on:click={handleExportPNG} title="Export canvas as PNG image">Export as PNG</button>
+          <button on:click={handleExportJPEG} title="Export canvas as JPEG image">Export as JPEG</button>
         </div>
       {/if}
     </div>
-    <button class="tool-button" on:click={zoomOut} title="Zoom out">-</button>
-    <span class="zoom-label">{Math.round(zoom * 100)}%</span>
-    <button class="tool-button" on:click={zoomIn} title="Zoom in">+</button>
-    <button class="tool-button" on:click={resetZoom} title="Reset zoom">⟳</button>
+    <button class="tool-button" on:click={zoomOut} title="Zoom out (Ctrl + -)">-</button>
+    <span class="zoom-label" title="Current zoom level">{Math.round(zoom * 100)}%</span>
+    <button class="tool-button" on:click={zoomIn} title="Zoom in (Ctrl + +)">+</button>
+    <button class="tool-button" on:click={resetZoom} title="Reset zoom to 100%">⟳</button>
   </div>
 
   <div class="right-section">

@@ -14,8 +14,9 @@
             class="command-box" 
             class:unapplied={index > currentCommandIndex}
             on:click={() => handleCommandClick(index)}
+            title={`${command.label} on ${command.layer.name}${index > currentCommandIndex ? ' (not applied)' : ''}`}
         >
-            <div class="layer-indicator" style="background-color: {command.layer.color}"></div>
+            <div class="layer-indicator" style="background-color: {command.layer.color}" title={command.layer.name}></div>
             <span class="command-label">{command.label}</span>
         </div>
     {/each}

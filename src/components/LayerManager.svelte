@@ -17,7 +17,7 @@
 </script>
 
 <div class="layer-manager">
-  <button class="layer-button" on:click={() => isOpen = !isOpen}>
+  <button class="layer-button" on:click={() => isOpen = !isOpen} title="Toggle Layer Panel">
     {isOpen ? '▼' : '▲'} Layers
   </button>
   
@@ -29,23 +29,25 @@
             <button 
               class="visibility-toggle"
               on:click={() => handleVisibilityToggle(layer.id)}
+              title={layer.visible ? 'Hide Layer' : 'Show Layer'}
             >
               {layer.visible ? '👁️' : '👁️‍🗨️'}
             </button>
-            <span class="layer-name" on:click={() => onLayerSelect(layer.id)}>
+            <span class="layer-name" on:click={() => onLayerSelect(layer.id)} title="Select Layer">
               {layer.name}
             </span>
             <button 
               class="delete-button"
               on:click={() => handleDeleteLayer(layer.id)}
               disabled={layers.length <= 1}
+              title={layers.length <= 1 ? 'Cannot delete the last layer' : 'Delete Layer'}
             >
               🗑️
             </button>
           </div>
         {/each}
       </div>
-      <button class="add-layer" on:click={handleAddLayer}>
+      <button class="add-layer" on:click={handleAddLayer} title="Add New Layer">
         + Add Layer
       </button>
     </div>
