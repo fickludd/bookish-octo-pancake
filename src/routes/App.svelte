@@ -2,11 +2,13 @@
 	import Canvas from '../components/Canvas.svelte';
 	import Toolbar from '../components/Toolbar.svelte';
 	import CommandHistoryBar from '../components/CommandHistoryBar.svelte';
+	import CanvasSizeSelector from '../components/CanvasSizeSelector.svelte';
 	import { tools as initialTools } from '$lib/tools';
 	import { replayCommands, resize } from '$lib/canvasState';
 
-	let canvasWidth = $state(480);
-	let canvasHeight = $state(480);
+	let canvasWidth = $state();
+	let canvasHeight = $state();
+	let canvasInitialized = $state(false);
 
 	let tools = $state(initialTools);
 	let activeToolName = $state('brush');
@@ -121,7 +123,6 @@
 		}
 	}
 
-	// Handle load completion
 	function handleLoadComplete() {
 		// Clear command history
 		commandHistory = [];
@@ -129,38 +130,49 @@
 		redrawTrigger++;
 	}
 
+	function handleCanvasSizeSelected(width, height) {
+		canvasWidth = width;
+		canvasHeight = height;
+		canvasInitialized = true;
+	}
+
 	$inspect(activeToolName);
 	$inspect(activeLayerId);
 </script>
 
 <main>
-	<Canvas 
-		{activeTool}
-		width={canvasWidth} 
-		height={canvasHeight} 
-		{layers} 
-		{activeLayerId} 
-		{addCommand}
-		{redrawTrigger}
-	/>
-	<Toolbar 
-		{activeToolName} 
-		setActiveTool={setActiveTool} 
-		{tools}
-		{updateTool}
-		{layers}
-		{activeLayerId}
-		onLayerSelect={handleLayerSelect}
-		onLayerAdd={handleLayerAdd}
-		onLayerDelete={handleLayerDelete}
-		onLayerVisibilityToggle={handleLayerVisibilityToggle}
-		onLoadComplete={handleLoadComplete}
-	/>
-	<CommandHistoryBar 
-		{commandHistory} 
-		{currentCommandIndex}
-		onCommandClick={handleCommandClick}
-	/>
+	{#if !canvasInitialized}
+		<CanvasSizeSelector on:selectSize={(e) => handleCanvasSizeSelected(e.detail.width, e.detail.height)} />
+	{:else}
+		<Canvas 
+			{activeTool}
+			width={canvasWidth} 
+			height={canvasHeight} 
+			{layers} 
+			{activeLayerId} 
+			{addCommand}
+			{redrawTrigger}
+		/>
+		<Toolbar 
+			{activeToolName} 
+			setActiveTool={setActiveTool} 
+			{tools}
+			{updateTool}
+			{layers}
+			{activeLayerId}
+			onLayerSelect={handleLayerSelect}
+			onLayerAdd={handleLayerAdd}
+			onLayerDelete={handleLayerDelete}
+			onLayerVisibilityToggle={handleLayerVisibilityToggle}
+			onLoadComplete={handleLoadComplete}
+			onCanvasSizeChange={handleCanvasSizeSelected}
+		/>
+		<CommandHistoryBar 
+			{commandHistory} 
+			{currentCommandIndex}
+			onCommandClick={handleCommandClick}
+		/>
+	{/if}
 </main>
 
 <style>

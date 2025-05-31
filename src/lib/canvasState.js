@@ -78,9 +78,7 @@ export function loadCanvasState(state) {
   // Clear existing state
   clearCanvases();
   
-  // Update dimensions
-  width = state.width;
-  height = state.height;
+  resize(state.width, state.height);
   
   // Create a promise for each layer's loading
   const loadPromises = state.layers.map(({layerId, image}) => {

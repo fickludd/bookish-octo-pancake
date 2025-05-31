@@ -3,7 +3,7 @@
   import LayerManager from './LayerManager.svelte';
   import { saveCanvasState, loadCanvasState } from '$lib/canvasState';
   
-  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete } = $props();
+  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange } = $props();
   
   $effect(() => {
     console.log('Toolbar - Active tool changed:', activeToolName);
@@ -42,6 +42,7 @@
         const reader = new FileReader();
         reader.onload = async (event) => {
           const state = JSON.parse(event.target.result);
+          onCanvasSizeChange(state.width, state.height);
           await loadCanvasState(state);
           onLoadComplete();
         };
