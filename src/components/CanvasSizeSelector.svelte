@@ -79,20 +79,20 @@
   .size-selector-bg {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(44, 62, 80, 0.97);
+    background: rgba(35, 39, 47, 0.97);
     z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .size-selector-modal {
-    background: #22313a;
-    border-radius: 12px;
-    padding: 32px 32px 24px 32px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 36px 36px 28px 36px;
+    box-shadow: 0 6px 32px rgba(59,130,246,0.18);
     min-width: 420px;
     max-width: 90vw;
-    color: #ecf0f1;
+    color: var(--color-text);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -100,96 +100,114 @@
   h2 {
     margin-bottom: 24px;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.02em;
+    color: var(--color-text);
   }
   .preset-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 18px;
+    margin-bottom: 22px;
   }
   .preset-btn {
-    background: #34495e;
+    background: var(--color-toolbar);
     border: none;
-    border-radius: 8px;
-    color: #ecf0f1;
-    padding: 18px 10px 12px 10px;
+    border-radius: 10px;
+    color: var(--color-text);
+    padding: 20px 12px 14px 12px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 120px;
     min-height: 70px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    font-weight: 500;
   }
   .preset-btn:hover {
-    background: #2980b9;
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.13);
   }
   .preset-name {
     font-weight: 600;
     font-size: 1.1rem;
     margin-bottom: 4px;
+    color: inherit;
   }
   .preset-desc {
-    font-size: 0.95rem;
-    opacity: 0.8;
+    font-size: 0.97rem;
+    opacity: 0.85;
+    color: inherit;
   }
   .preset-desc span {
-    font-size: 0.85em;
+    font-size: 0.87em;
     opacity: 0.7;
   }
   .custom-row {
-    margin-top: 18px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
   }
   .custom-btn {
-    background: #34495e;
-    color: #ecf0f1;
+    background: var(--color-toolbar);
+    color: var(--color-text);
     border: none;
     border-radius: 8px;
-    padding: 10px 24px;
+    padding: 12px 28px;
     font-size: 1rem;
     cursor: pointer;
-    margin-bottom: 8px;
-    transition: background 0.15s;
+    margin-bottom: 10px;
+    transition: background 0.15s, color 0.15s;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
   .custom-btn:hover {
-    background: #2980b9;
+    background: var(--color-accent);
+    color: #fff;
   }
   .custom-fields {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 10px;
+    margin-top: 6px;
   }
   .custom-fields input[type="number"] {
-    width: 80px;
-    padding: 4px 6px;
-    border-radius: 4px;
-    border: 1px solid #7f8c8d;
-    background: #22313a;
-    color: #ecf0f1;
+    width: 90px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
     font-size: 1rem;
     text-align: right;
+    font-weight: 500;
+    transition: border 0.15s;
+  }
+  .custom-fields input[type="number"]:focus {
+    border: 1.5px solid var(--color-accent);
+    outline: none;
   }
   .ok-btn {
-    background: #27ae60;
-    color: #fff;
+    background: var(--color-accent);
+    color: var(--color-white);
     border: none;
-    border-radius: 6px;
-    padding: 6px 16px;
+    border-radius: 7px;
+    padding: 8px 20px;
     font-size: 1rem;
     cursor: pointer;
-    margin-left: 8px;
+    margin-left: 10px;
+    font-weight: 600;
     transition: background 0.15s;
+    box-shadow: 0 1px 4px rgba(59,130,246,0.10);
   }
   .ok-btn:hover {
-    background: #219150;
+    background: var(--color-accent-hover);
   }
 </style> 

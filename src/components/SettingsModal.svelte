@@ -51,7 +51,7 @@
   }
 
   .modal {
-    background-color: #2c3e50;
+    background-color: var(--color-surface);
     border-radius: 8px;
     padding: 20px;
     min-width: 300px;
@@ -67,14 +67,14 @@
 
   .modal-header h3 {
     margin: 0;
-    color: #ecf0f1;
+    color: var(--color-text);
     text-transform: capitalize;
   }
 
   .close-button {
     background: none;
     border: none;
-    color: #ecf0f1;
+    color: var(--color-text);
     font-size: 24px;
     cursor: pointer;
     padding: 0;
@@ -85,14 +85,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #ecf0f1;
+    color: var(--color-text);
   }
 
   input[type="range"] {
     flex: 1;
     height: 4px;
     -webkit-appearance: none;
-    background: #34495e;
+    background: var(--color-toolbar);
     border-radius: 2px;
     outline: none;
   }
@@ -101,7 +101,7 @@
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    background: #3498db;
+    background: var(--color-accent);
     border-radius: 50%;
     cursor: pointer;
   }

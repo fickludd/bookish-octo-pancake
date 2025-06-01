@@ -206,31 +206,56 @@
 </main>
 
 <style>
+	:global(html) {
+		font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+		--color-bg: #23272f;
+		--color-surface: #2d323b;
+		--color-toolbar: #232c3b;
+		--color-canvas-bg: #888;
+		--color-accent-selected: #3b5286;
+		--color-accent: #3b82f6;
+		--color-accent-hover: #2563eb;
+		--color-border: #3b4252;
+		--color-text: #e5e7eb;
+		--color-text-secondary: #b0b8c1;
+		--color-white: #fff;
+		--color-black: #000;
+		--color-disabled: #888;
+		--color-shadow: 0 2px 8px rgba(59,130,246,0.08);
+		--color-shadow-strong: 0 6px 32px rgba(59,130,246,0.18);
+		--color-shadow-toolbar: 0 -2px 12px rgba(0, 0, 0, 0.10);
+		--color-shadow-panel: 0 -2px 16px rgba(0, 0, 0, 0.22);
+		--color-shadow-subtle: 0 1px 4px rgba(0,0,0,0.08);
+		--color-shadow-accent: 0 2px 8px rgba(59,130,246,0.13);
+		--color-shadow-accent-light: 0 1px 4px rgba(59,130,246,0.10);
+	}
 	main {
 		width: 100vw;
 		height: 100vh;
 		margin: 0;
 		padding: 0;
 		overflow: hidden;
-		background-color: #2c3e50;
+		background-color: var(--color-bg);
+		color: var(--color-text);
 	}
 	.zoom-indicator {
 		position: fixed;
 		top: 16px;
 		right: 32px;
-		background: #34495e;
-		color: #ecf0f1;
+		background: var(--color-toolbar);
+		color: var(--color-text);
 		padding: 6px 16px;
 		border-radius: 20px;
-		font-size: 1.1rem;
-		font-weight: 600;
-		box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+		font-size: 1.0rem;
+		font-weight: 500;
+		box-shadow: var(--color-shadow);
 		cursor: pointer;
 		z-index: 1001;
 		user-select: none;
 		transition: background 0.15s;
 	}
 	.zoom-indicator:hover {
-		background: #2980b9;
+		background: var(--color-accent);
+		color: var(--color-white);
 	}
 </style>

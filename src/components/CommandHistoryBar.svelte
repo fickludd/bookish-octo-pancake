@@ -30,7 +30,7 @@
         right: 0;
         width: 100%;
         height: 40px;
-        background-color: #2c3e50;
+        background-color: #1b2027; /* slightly darker than toolbar */
         display: flex;
         align-items: center;
         padding: 0 10px;
@@ -40,22 +40,24 @@
     }
 
     .command-box {
-        background-color: #34495e;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
+        background-color: var(--color-toolbar);
+        color: var(--color-white);
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 13px;
         white-space: nowrap;
         min-width: fit-content;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         cursor: pointer;
-        transition: opacity 0.2s;
+        transition: background 0.18s, color 0.18s, opacity 0.18s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     .command-box:hover {
-        background-color: #2c3e50;
+        background-color: var(--color-accent);
+        color: #fff;
     }
 
     .command-box.unapplied {
@@ -63,13 +65,16 @@
     }
 
     .layer-indicator {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        opacity: 0.7;
+        opacity: 0.8;
+        margin-right: 2px;
     }
 
     .command-label {
-        opacity: 0.9;
+        opacity: 0.92;
+        font-weight: 500;
+        letter-spacing: 0.01em;
     }
 </style> 

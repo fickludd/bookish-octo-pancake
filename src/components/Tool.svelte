@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import SettingsModal from './SettingsModal.svelte';
+  import { IconBrush, IconEraser, IconSettings } from '@tabler/icons-svelte';
   
   let { name = '', icon = '', active = false, tool, updateTool } = $props();
   let showSettings = $state(false);
@@ -10,15 +11,26 @@
   function handleClick() {
     dispatch('click');
   }
+
+  let IconComponent = $derived(name === 'brush' ? IconBrush : name === 'eraser' ? IconEraser : null);
 </script>
 
-<div class="tool" class:active>
-  <div class="tool-content" on:click title={`${name.charAt(0).toUpperCase() + name.slice(1)} Tool`}>
-    <span class="icon">{icon}</span>
-    <span class="name">{name}</span>
+<div 
+  class="tool" 
+  class:active 
+  onclick={handleClick}
+  onkeydown={(e) => e.key === 'Enter' && handleClick()}
+  role="button"
+  tabindex="0"
+>
+  <div class="tool-content" title={`${name.charAt(0).toUpperCase() + name.slice(1)} Tool`}>
+    {#if IconComponent}
+      <IconComponent class="icon" stroke={active ? 2.2 : 1.7} color={active ? 'var(--color-accent)' : 'var(--color-text-secondary)'} />
+    {/if}
+    <span class="name">{name.charAt(0).toUpperCase() + name.slice(1)}</span>
   </div>
-  <button class="settings-button" on:click|stopPropagation={() => showSettings = true} title={`${name.charAt(0).toUpperCase() + name.slice(1)} Settings`}>
-    ⚙️
+  <button class="settings-button" onclick={() => showSettings = true} stopPropagation={() => showSettings = true} title={`${name.charAt(0).toUpperCase() + name.slice(1)} Settings`}>
+    <IconSettings class="icon settings-icon" stroke={1.7} color="var(--color-text-secondary)" />
   </button>
 </div>
 
@@ -34,22 +46,26 @@
   .tool {
     background: none;
     border: none;
-    color: #ecf0f1;
-    padding: 8px 16px;
-    border-radius: 4px;
+    color: var(--color-text);
+    padding: 10px 18px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: background-color 0.2s;
+    gap: 12px;
+    transition: background 0.18s, box-shadow 0.18s;
+    box-shadow: none;
   }
 
   .tool:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--color-surface);
+    box-shadow: var(--color-shadow);
   }
 
   .tool.active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--color-accent-selected);
+    color: var(--color-white);
+    box-shadow: 0 2px 8px rgba(59,130,246,0.15);
   }
 
   .tool-content {
@@ -60,26 +76,37 @@
   }
 
   .icon {
-    font-size: 24px;
+    width: 28px;
+    height: 28px;
+    display: block;
+  }
+
+  .settings-icon {
+    width: 22px;
+    height: 22px;
   }
 
   .name {
-    font-size: 12px;
+    font-size: 13px;
     text-transform: capitalize;
+    font-weight: 500;
+    color: inherit;
   }
 
   .settings-button {
     background: none;
     border: none;
-    color: #ecf0f1;
+    color: var(--color-text-secondary);
     font-size: 16px;
     padding: 4px;
     cursor: pointer;
     opacity: 0.7;
-    transition: opacity 0.2s;
+    border-radius: 6px;
+    transition: opacity 0.18s, background 0.18s;
   }
 
   .settings-button:hover {
     opacity: 1;
+    background: var(--color-surface);
   }
 </style> 

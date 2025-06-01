@@ -215,7 +215,7 @@
   .canvas-container {
     width: 100%;
     height: calc(100vh - 100px); /* Subtract toolbar (60px) and command history (40px) heights */
-    background-color: #2c3e50;
+    background-color: var(--color-surface);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -226,7 +226,7 @@
   }
 
   canvas {
-    background-color: #908383;
+    background-color: var(--color-canvas-bg);
     cursor: crosshair;
     padding: 0;
     margin: 0;

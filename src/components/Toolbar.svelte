@@ -3,6 +3,7 @@
   import LayerManager from './LayerManager.svelte';
   import { saveCanvasState, loadCanvasState } from '$lib/canvasState';
   import { onMount, onDestroy } from 'svelte';
+  import { IconFolder, IconMinus, IconPlus, IconRefresh } from '@tabler/icons-svelte';
   
   let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom } = $props();
   
@@ -148,7 +149,7 @@
   <div class="file-actions">
     <div class="file-menu">
       <button class="tool-button" on:click={() => showFileMenu = !showFileMenu} title="File operations">
-        📁
+        <IconFolder class="icon" stroke={1.7} color="var(--color-text-secondary)" />
       </button>
       {#if showFileMenu}
         <div class="file-dropdown">
@@ -160,10 +161,16 @@
         </div>
       {/if}
     </div>
-    <button class="tool-button" on:click={zoomOut} title="Zoom out (Ctrl + -)">-</button>
+    <button class="tool-button" on:click={zoomOut} title="Zoom out (Ctrl + -)">
+      <IconMinus class="icon" stroke={2} color="var(--color-text-secondary)" />
+    </button>
     <span class="zoom-label" title="Current zoom level">{Math.round(zoom * 100)}%</span>
-    <button class="tool-button" on:click={zoomIn} title="Zoom in (Ctrl + +)">+</button>
-    <button class="tool-button" on:click={resetZoom} title="Reset zoom to 100%">⟳</button>
+    <button class="tool-button" on:click={zoomIn} title="Zoom in (Ctrl + +)">
+      <IconPlus class="icon" stroke={2} color="var(--color-text-secondary)" />
+    </button>
+    <button class="tool-button" on:click={resetZoom} title="Reset zoom to 100%">
+      <IconRefresh class="icon" stroke={2} color="var(--color-text-secondary)" />
+    </button>
   </div>
 
   <div class="right-section">
@@ -181,23 +188,24 @@
 <style>
   .toolbar {
     width: 100%;
-    height: 60px;
-    background-color: #34495e;
+    height: 64px;
+    background-color: var(--color-toolbar);
     position: fixed;
     bottom: 40px;
     left: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0 28px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.10);
     overflow: visible;
-    gap: 20px;
+    gap: 24px;
+    z-index: 100;
   }
 
   .tools {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     flex-shrink: 0;
   }
 
@@ -211,11 +219,12 @@
   .tool-options {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 0 10px;
-    background-color: #34495e;
-    border-radius: 4px;
+    gap: 16px;
+    padding: 0 14px;
+    background-color: var(--color-surface);
+    border-radius: 8px;
     flex-shrink: 0;
+    box-shadow: var(--color-shadow);
   }
 
   .color-picker {
@@ -223,8 +232,10 @@
     height: 40px;
     padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    background: var(--color-bg);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   .color-picker::-webkit-color-swatch-wrapper {
@@ -233,59 +244,91 @@
 
   .color-picker::-webkit-color-swatch {
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
   .sliders {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .slider-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   .slider-group label {
-    color: #ecf0f1;
-    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-size: 13px;
     min-width: 40px;
+    font-weight: 500;
   }
 
   input[type="range"] {
-    width: 100px;
-    height: 4px;
+    width: 110px;
+    height: 6px;
     -webkit-appearance: none;
-    background: #7f8c8d;
-    border-radius: 2px;
+    background: var(--color-border);
+    border-radius: 3px;
     outline: none;
+    transition: background 0.2s;
   }
 
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #3498db;
+    width: 18px;
+    height: 18px;
+    background: var(--color-accent);
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(59,130,246,0.10);
+    border: 2px solid var(--color-bg);
+    transition: background 0.2s, border 0.2s;
   }
 
   .file-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-shrink: 0;
     align-items: center;
   }
 
+  .tool-button {
+    background: var(--color-surface);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 10px;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .tool-button:hover {
+    background: var(--color-accent);
+    color: var(--color-white);
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+
   .zoom-label {
-    color: #ecf0f1;
+    color: var(--color-text);
     font-size: 1rem;
-    margin: 0 6px;
+    margin: 0 8px;
     min-width: 40px;
     text-align: center;
     user-select: none;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   .file-menu {
@@ -296,33 +339,37 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    background-color: #2c3e50;
-    border-radius: 4px;
-    padding: 8px 0;
-    min-width: 160px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    margin-bottom: 8px;
+    background-color: var(--color-surface);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 170px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    margin-bottom: 10px;
+    z-index: 10;
   }
 
   .file-dropdown button {
     display: block;
     width: 100%;
-    padding: 8px 16px;
+    padding: 10px 18px;
     border: none;
     background: none;
-    color: #ecf0f1;
+    color: var(--color-text);
     text-align: left;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
+    border-radius: 0;
+    transition: background 0.13s, color 0.13s;
   }
 
   .file-dropdown button:hover {
-    background-color: #34495e;
+    background-color: var(--color-accent);
+    color: var(--color-white);
   }
 
   .separator {
     height: 1px;
-    background-color: #34495e;
-    margin: 8px 0;
+    background-color: var(--color-border);
+    margin: 10px 0;
   }
 </style> 
