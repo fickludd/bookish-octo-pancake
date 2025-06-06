@@ -66,9 +66,9 @@ export function saveCanvasState() {
   const state = {
     width,
     height,
-    layers: Array.from(layerCanvases.entries()).map(([layerId, {base, latest}]) => ({
+    layers: Array.from(layerCanvases.entries()).map(([layerId, {base, latest, image}]) => ({
       layerId,
-      image: latest.toDataURL()
+      image: (latest ? latest : image).toDataURL()
     }))
   };
   return state;

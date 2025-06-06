@@ -63,17 +63,24 @@
 		activeLayerId = layerId;
 	}
 
-	function handleLayerAdd() {
-		const newIdInt = layerNextId++;
-		const newId = String(newIdInt);
-		const colorIndex = (newIdInt) % layerColors.length;
-		layers = [...layers, { 
-			id: newId, 
-			name: `Layer ${newId}`, 
-			visible: true,
-			color: layerColors[colorIndex]
-		}];
-		activeLayerId = newId;
+	function handleLayerAdd(newLayer) {
+		if (newLayer) {
+			// If a new layer is provided (e.g., for image import), use it
+			layers = [...layers, newLayer];
+			activeLayerId = newLayer.id;
+		} else {
+			// Create a new regular layer
+			const newIdInt = layerNextId++;
+			const newId = String(newIdInt);
+			const colorIndex = (newIdInt) % layerColors.length;
+			layers = [...layers, { 
+				id: newId, 
+				name: `Layer ${newId}`, 
+				visible: true,
+				color: layerColors[colorIndex]
+			}];
+			activeLayerId = newId;
+		}
 	}
 
 	function handleLayerDelete(layerId) {

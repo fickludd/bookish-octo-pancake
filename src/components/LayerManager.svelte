@@ -1,5 +1,5 @@
 <script>
-  import { IconEye, IconEyeOff, IconTrash, IconPlus, IconChevronUp, IconChevronDown } from '@tabler/icons-svelte';
+  import { IconEye, IconEyeOff, IconTrash, IconPlus, IconChevronUp, IconChevronDown, IconPhoto } from '@tabler/icons-svelte';
   let { layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle } = $props();
   let isOpen = $state(false);
   
@@ -13,6 +13,37 @@
   
   function handleVisibilityToggle(layerId) {
     onLayerVisibilityToggle(layerId);
+  }
+
+  function handleImportImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            // Create a new layer with the image
+            const newLayer = {
+              id: String(Date.now()),
+              name: file.name,
+              visible: true,
+              type: 'image',
+              image: img,
+              width: img.width,
+              height: img.height
+            };
+            onLayerAdd(newLayer);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   }
 </script>
 
@@ -44,6 +75,9 @@
             </button>
             <span class="layer-name" on:click={() => onLayerSelect(layer.id)} title="Select Layer">
               {layer.name}
+              {#if layer.type === 'image'}
+                <IconPhoto class="icon small" stroke={1.5} color="var(--color-text-secondary)" />
+              {/if}
             </span>
             <button 
               class="delete-button"
@@ -56,9 +90,14 @@
           </div>
         {/each}
       </div>
-      <button class="add-layer" on:click={handleAddLayer} title="Add New Layer">
-        <IconPlus class="icon" stroke={2.2} color="var(--color-white)" style="margin-right: 6px;" /> Add Layer
-      </button>
+      <div class="layer-actions">
+        <button class="import-image" on:click={handleImportImage} title="Import Image as Layer">
+          <IconPhoto class="icon" stroke={2} color="var(--color-white)" style="margin-right: 6px;" /> Import Image
+        </button>
+        <button class="add-layer" on:click={handleAddLayer} title="Add New Layer">
+          <IconPlus class="icon" stroke={2.2} color="var(--color-white)" style="margin-right: 6px;" /> Add Layer
+        </button>
+      </div>
     </div>
   {/if}
 </div>
@@ -189,5 +228,39 @@
     height: 20px;
     display: inline-block;
     vertical-align: middle;
+  }
+  
+  .layer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .import-image {
+    width: 100%;
+    background-color: var(--color-surface);
+    border: none;
+    color: var(--color-white);
+    padding: 10px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .import-image:hover {
+    background-color: var(--color-accent);
+  }
+
+  .icon.small {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
   }
 </style> 

@@ -41,9 +41,15 @@
     // Draw layers in order, respecting visibility
     layers.forEach(layer => {
       if (layer.visible) {
-        const { base, latest } = getOrCreateLayerCanvas(layer.id);
-        mainContext.drawImage(base, 0, 0);
-        mainContext.drawImage(latest, 0, 0);
+        if (layer.type === 'image') {
+          // Draw image layer
+          mainContext.drawImage(layer.image, 0, 0);
+        } else {
+          // Draw regular layer
+          const { base, latest } = getOrCreateLayerCanvas(layer.id);
+          mainContext.drawImage(base, 0, 0);
+          mainContext.drawImage(latest, 0, 0);
+        }
       }
     });
     mainContext.setTransform(1, 0, 0, 1, 0, 0);
@@ -76,33 +82,14 @@
   let spacePressed = false;
 
   function handleWheel(e) {
-    if (e.ctrlKey || e.metaKey || e.deltaY !== 0) {
-      e.preventDefault();
-      /*
-      const factor = e.deltaY < 0 ? 1.1 : 0.9;
-      const newZoom = Math.max(0.1, Math.min(zoom * factor, 10));
-      
-      // Get mouse position in screen space
-      const rect = mainCanvas.getBoundingClientRect();
-      const mouseScreenX = e.clientX - rect.left;
-      const mouseScreenY = e.clientY - rect.top;
-      
-      // Convert mouse position to canvas space
-      const mouseCanvas = screenToCanvas(mouseScreenX, mouseScreenY, width, height, zoom, pan);
-      
-      // Convert back to screen space with new zoom
-      const newMouseScreen = canvasToScreen(mouseCanvas.x, mouseCanvas.y, width, height, newZoom, pan);
-      
-      // Calculate new pan to keep mouse point in same screen position
-      const newPan = {
-        x: mouseScreenX - newMouseScreen.x + pan.x,
-        y: mouseScreenY - newMouseScreen.y + pan.y
-      };
-      
-      setPan(newPan);
-      setZoom(newZoom);
-      */
-    }
+    e.preventDefault();
+    
+    // Handle pan with two-finger scroll
+    const movement = calculateCanvasPanMovement(e.deltaX, e.deltaY, zoom);
+    setPan({
+      x: pan.x - movement.x,
+      y: pan.y - movement.y
+    });
   }
 
   function handlePointerDown(e) {
@@ -111,6 +98,8 @@
       lastPointer = { x: e.clientX, y: e.clientY };
       lastPan = { ...pan };
       mainCanvas.style.cursor = 'grab';
+    } else if (e.pointerType === 'pen') {
+      mainCanvas.style.cursor = 'none';
     }
   }
 
@@ -120,12 +109,18 @@
       const screenDeltaY = e.clientY - lastPointer.y;
       const movement = calculateCanvasPanMovement(screenDeltaX, screenDeltaY, zoom);
       setPan({ x: lastPan.x + movement.x, y: lastPan.y + movement.y });
+    } else if (e.pointerType === 'pen') {
+      mainCanvas.style.cursor = 'none';
     }
   }
 
   function handlePointerUp() {
     isPanning = false;
-    mainCanvas.style.cursor = spacePressed ? 'grab' : 'crosshair';
+    if (spacePressed) {
+      mainCanvas.style.cursor = 'grab';
+    } else {
+      mainCanvas.style.cursor = 'crosshair';
+    }
   }
 
   function handleKeyDown(e) {
@@ -137,7 +132,9 @@
   function handleKeyUp(e) {
     if (e.code === 'Space') {
       spacePressed = false;
-      if (!isPanning) mainCanvas.style.cursor = 'crosshair';
+      if (!isPanning) {
+        mainCanvas.style.cursor = 'crosshair';
+      }
     }
   }
 
@@ -168,6 +165,7 @@
         const screenX = e.clientX;
         const screenY = e.clientY;
         coords = screenToCanvas(screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
+        coords.pressure = e.pointerType === 'pen' ? (e.pressure || 1.0) : 1.0;
         const { base, latest } = getOrCreateLayerCanvas(activeLayerId);
         const layerContext = latest.getContext('2d');
         const activeLayer = layers.find(l => l.id === activeLayerId);
