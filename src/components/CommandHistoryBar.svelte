@@ -14,10 +14,12 @@
 
 <div class="command-history-bar">
     {#each commandHistory as command, index}
-        <div 
+        <button 
             class="command-box" 
             class:unapplied={command.nbr > currentCommandNbr}
-            on:click={() => handleCommandClick(command.nbr)}
+            onclick={() => handleCommandClick(command.nbr)}
+            onkeydown={(e) => e.key === 'Enter' && handleCommandClick(command.nbr)}
+            onkeyup={(e) => e.key === ' ' && handleCommandClick(command.nbr)}
             title={`${command.label} on ${command.layer.name}${command.nbr > currentCommandNbr ? ' (not applied)' : ''}`}
         >
             {#if command.tool}
@@ -30,7 +32,7 @@
             {:else}
                 <IconBrush class="tool-icon" stroke={1.7} color={command.layer.color} />
             {/if}
-        </div>
+        </button>
     {/each}
 </div>
 
