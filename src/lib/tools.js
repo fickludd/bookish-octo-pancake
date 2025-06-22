@@ -42,6 +42,11 @@ function endMouseDrawCommand(self, activeLayer) {
   const command = {
     label: self.name + " draw",
     layer: activeLayer,
+    tool: {
+      name: self.name,
+      icon: self.icon,
+      color: self.color
+    },
     steps: self.steps,
     applyCommand: (self, context) => {
       self.steps.forEach(step => step.applyStep(context));
