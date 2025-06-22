@@ -4,7 +4,7 @@
 	import CommandHistoryBar from '../components/CommandHistoryBar.svelte';
 	import CanvasSizeSelector from '../components/CanvasSizeSelector.svelte';
 	import { tools as initialTools } from '$lib/tools';
-	import { replayCommands, resize } from '$lib/canvasState';
+	import { replayCommands, resize, getOrCreateLayerCanvas } from '$lib/canvasState';
 	import { onMount, onDestroy } from 'svelte';
 
 	let canvasWidth = $state();
@@ -35,8 +35,11 @@
 	let activeLayerId = $state('1');
 	let layerNextId = 2;
 
-	let commandHistory = $state([])
+	// Command history with max size
+	const HISTORY_LIMIT = 3; // Maximum number of commands to keep in memory
+	let commandHistory = $state([]);
 	let currentCommandIndex = $state(-1);
+	let historyOffset = $state(0); // Offset to the first command in the circular buffer
 	let redrawTrigger = $state(0);
 
 	let zoom = $state(1);
@@ -155,6 +158,20 @@
 			// Discard any commands after the current index
 			const appliedHistory = commandHistory.slice(0, currentCommandIndex + 1);
 			commandHistory = [...appliedHistory, command];
+
+			// If history is full, commit the oldest command to base canvas
+			if (commandHistory.length > HISTORY_LIMIT) {
+				const oldestCommand = commandHistory[0];
+				const { base } = getOrCreateLayerCanvas(oldestCommand.layer.id);
+				const baseContext = base.getContext('2d');
+				oldestCommand.applyCommand(oldestCommand, baseContext);
+				
+				// Remove oldest command and update offset
+				commandHistory = commandHistory.slice(1);
+				historyOffset++;
+			}
+			
+			// Add new command
 			currentCommandIndex = commandHistory.length - 1;
 		}
 	}
@@ -163,6 +180,7 @@
 		// Clear command history
 		commandHistory = [];
 		currentCommandIndex = -1;
+		historyOffset = 0;
 		redrawTrigger++;
 	}
 

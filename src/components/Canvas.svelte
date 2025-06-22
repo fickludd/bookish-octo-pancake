@@ -182,7 +182,6 @@
         const screenY = e.clientY;
         const previous = coords;
         coords = screenToCanvas(screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
-        console.log("coords", coords, screenX, screenY, containerRect.width, containerRect.height, width, height, zoom, pan);
         coords.pressure = e.pointerType === 'pen' ? (e.pressure || 1.0) : 1.0;
         if (e.buttons === 1) {
           e.preventDefault();

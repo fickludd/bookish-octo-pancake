@@ -42,11 +42,6 @@ function endMouseDrawCommand(self, activeLayer) {
   const command = {
     label: self.name + " draw",
     layer: activeLayer,
-    tool: {
-      name: self.name,
-      icon: self.icon,
-      color: self.color
-    },
     steps: self.steps,
     applyCommand: (self, context) => {
       self.steps.forEach(step => step.applyStep(context));
@@ -68,7 +63,6 @@ export const tools = {
     updateCommand: updateMouseDrawCommand,
     endCommand: endMouseDrawCommand,
     draw: (self, context, from, to) => {
-      console.log("draw", to.pressure)
       const pressure = to.pressure || 1.0;
       const size = self.size * pressure;
       const opacity = self.opacity * pressure;
