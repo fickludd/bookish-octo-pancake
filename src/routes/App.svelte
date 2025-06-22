@@ -36,7 +36,7 @@
 	let layerNextId = 2;
 
 	// Command history with max size
-	const HISTORY_LIMIT = 3; // Maximum number of commands to keep in memory
+	const HISTORY_LIMIT = 30; // Maximum number of commands to keep in memory
 	let commandHistory = $state([]);
 	let currentCommandNbr = $state(-1);
 	let commandHistoryOffset = $state(0);
