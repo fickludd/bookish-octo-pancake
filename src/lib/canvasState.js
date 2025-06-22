@@ -66,9 +66,10 @@ export function saveCanvasState() {
   const state = {
     width,
     height,
-    layers: Array.from(layerCanvases.entries()).map(([layerId, {base, latest, image}]) => ({
+    layers: Array.from(layerCanvases.entries()).map(([layerId, {latest, image, type}]) => ({
       layerId,
-      image: (latest ? latest : image).toDataURL()
+      image: (latest ? latest : image).toDataURL(),
+      type: type,
     }))
   };
   return state;
@@ -81,9 +82,9 @@ export function loadCanvasState(state) {
   resize(state.width, state.height);
   
   // Create a promise for each layer's loading
-  const loadPromises = state.layers.map(({layerId, image}) => {
+  const loadPromises = state.layers.map(({layerId, type, image}) => {
     return new Promise((resolve) => {
-      const {base, latest} = getOrCreateLayerCanvas(layerId);
+      const {base, image, latest} = getOrCreateLayerCanvas(layerId);
       
       // Load base image
       const baseImg = new Image();
