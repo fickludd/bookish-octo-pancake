@@ -3,9 +3,9 @@
   import LayerManager from './LayerManager.svelte';
   import { saveCanvasState, loadCanvasState } from '$lib/canvasState';
   import { onMount, onDestroy } from 'svelte';
-  import { IconFolder, IconMinus, IconPlus, IconRefresh } from '@tabler/icons-svelte';
+  import { IconFolder, IconMinus, IconPlus, IconRefresh, IconArrowBackUp, IconArrowForwardUp } from '@tabler/icons-svelte';
   
-  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom } = $props();
+  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom, commandHistory, currentCommandIndex, onUndo, onRedo } = $props();
   
   let showFileMenu = $state(false);
   
@@ -161,6 +161,22 @@
         </div>
       {/if}
     </div>
+    <button 
+      class="tool-button" 
+      on:click={onUndo} 
+      disabled={currentCommandIndex < 0}
+      title="Undo (Ctrl+Z)"
+    >
+      <IconArrowBackUp class="icon" stroke={2} color={currentCommandIndex < 0 ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
+    </button>
+    <button 
+      class="tool-button" 
+      on:click={onRedo} 
+      disabled={currentCommandIndex >= commandHistory.length - 1}
+      title="Redo (Ctrl+Y)"
+    >
+      <IconArrowForwardUp class="icon" stroke={2} color={currentCommandIndex >= commandHistory.length - 1 ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
+    </button>
     <button class="tool-button" on:click={zoomOut} title="Zoom out (Ctrl + -)">
       <IconMinus class="icon" stroke={2} color="var(--color-text-secondary)" />
     </button>
@@ -312,6 +328,16 @@
   .tool-button:hover {
     background: var(--color-accent);
     color: var(--color-white);
+  }
+
+  .tool-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .tool-button:disabled:hover {
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
   }
 
   .icon {

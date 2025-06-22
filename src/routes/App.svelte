@@ -5,6 +5,7 @@
 	import CanvasSizeSelector from '../components/CanvasSizeSelector.svelte';
 	import { tools as initialTools } from '$lib/tools';
 	import { replayCommands, resize } from '$lib/canvasState';
+	import { onMount, onDestroy } from 'svelte';
 
 	let canvasWidth = $state();
 	let canvasHeight = $state();
@@ -124,6 +125,31 @@
 		redrawTrigger++;
 	}
 
+	function undo() {
+		if (currentCommandIndex >= 0) {
+			rewindToCommand(currentCommandIndex - 1);
+		}
+	}
+
+	function redo() {
+		if (currentCommandIndex < commandHistory.length - 1) {
+			forwardToCommand(currentCommandIndex + 1);
+		}
+	}
+
+	function handleKeyDown(e) {
+		// Undo: Ctrl+Z
+		if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+			e.preventDefault();
+			undo();
+		}
+		// Redo: Ctrl+Y or Ctrl+Shift+Z
+		if (e.ctrlKey && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+			e.preventDefault();
+			redo();
+		}
+	}
+
 	function addCommand(command) {
 		if (command) {
 			// Discard any commands after the current index
@@ -165,6 +191,14 @@
 
 	$inspect(activeToolName);
 	$inspect(activeLayerId);
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyDown);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeyDown);
+	});
 </script>
 
 <main>
@@ -196,10 +230,14 @@
 			onLayerVisibilityToggle={handleLayerVisibilityToggle}
 			onLoadComplete={handleLoadComplete}
 			onCanvasSizeChange={handleCanvasSizeSelected}
-			zoom={zoom}
-			zoomIn={zoomIn}
-			zoomOut={zoomOut}
-			resetZoom={resetZoom}
+			{zoom}
+			{zoomIn}
+			{zoomOut}
+			{resetZoom}
+			{commandHistory}
+			{currentCommandIndex}
+			onUndo={undo}
+			onRedo={redo}
 		/>
 		<div class="zoom-indicator" on:click={resetZoom} title="Reset zoom">
 			{Math.round(zoom * 100)}%
