@@ -38,9 +38,17 @@
 	// Command history with max size
 	const HISTORY_LIMIT = 3; // Maximum number of commands to keep in memory
 	let commandHistory = $state([]);
-	let currentCommandIndex = $state(-1);
-	let historyOffset = $state(0); // Offset to the first command in the circular buffer
+	let currentCommandNbr = $state(-1);
+	let commandHistoryOffset = $state(0);
 	let redrawTrigger = $state(0);
+
+	let canUndo = $state(false);
+	let canRedo = $state(false);
+
+	$effect(() => {
+		canUndo = asIndex(currentCommandNbr) > 0;
+		canRedo = asIndex(currentCommandNbr) < commandHistory.length - 1;
+	});
 
 	let zoom = $state(1);
 	let pan = $state({ x: 0, y: 0 });
@@ -103,40 +111,44 @@
 		);
 	}
 
-	function handleCommandClick(index) {
-		if (index === currentCommandIndex) {
+	function asIndex(commandNbr) {
+		return commandNbr - commandHistoryOffset;
+	}
+
+	function handleCommandClick(commandNbr) {
+		if (commandNbr === currentCommandNbr) {
 			// If clicking the current command, rewind to before it
-			rewindToCommand(index - 1);
-		} else if (index < currentCommandIndex) {
+			rewindToCommand(commandNbr - 1);
+		} else if (commandNbr < currentCommandNbr) {
 			// If clicking a command before current, rewind to it
-			rewindToCommand(index);
+			rewindToCommand(commandNbr);
 		} else {
 			// If clicking a command after current, forward to it
-			forwardToCommand(index);
+			forwardToCommand(commandNbr);
 		}
 	}
 
-	function rewindToCommand(targetIndex) {
-		replayCommands(commandHistory, 0, targetIndex);
-		currentCommandIndex = targetIndex;
+	function rewindToCommand(targetCommandNbr) {
+		replayCommands(commandHistory, 0, asIndex(targetCommandNbr));
+		currentCommandNbr = targetCommandNbr;
 		redrawTrigger++;
 	}
 
-	function forwardToCommand(targetIndex) {
-		replayCommands(commandHistory, currentCommandIndex + 1, targetIndex);
-		currentCommandIndex = targetIndex;
+	function forwardToCommand(targetCommandNbr) {
+		replayCommands(commandHistory, asIndex(currentCommandNbr + 1), asIndex(targetCommandNbr));
+		currentCommandNbr = targetCommandNbr;
 		redrawTrigger++;
 	}
 
 	function undo() {
-		if (currentCommandIndex >= 0) {
-			rewindToCommand(currentCommandIndex - 1);
+		if (asIndex(currentCommandNbr) >= 0) {
+			rewindToCommand(currentCommandNbr - 1);
 		}
 	}
 
 	function redo() {
-		if (currentCommandIndex < commandHistory.length - 1) {
-			forwardToCommand(currentCommandIndex + 1);
+		if (asIndex(currentCommandNbr) < commandHistory.length - 1) {
+			forwardToCommand(currentCommandNbr + 1);
 		}
 	}
 
@@ -156,7 +168,9 @@
 	function addCommand(command) {
 		if (command) {
 			// Discard any commands after the current index
-			const appliedHistory = commandHistory.slice(0, currentCommandIndex + 1);
+			const newCommandNbr = currentCommandNbr + 1;
+			command.nbr = newCommandNbr;
+			const appliedHistory = commandHistory.slice(0, asIndex(newCommandNbr));
 			commandHistory = [...appliedHistory, command];
 
 			// If history is full, commit the oldest command to base canvas
@@ -168,19 +182,19 @@
 				
 				// Remove oldest command and update offset
 				commandHistory = commandHistory.slice(1);
-				historyOffset++;
+				commandHistoryOffset++;
 			}
 			
 			// Add new command
-			currentCommandIndex = commandHistory.length - 1;
+			currentCommandNbr = newCommandNbr;
 		}
 	}
 
 	function handleLoadComplete() {
 		// Clear command history
 		commandHistory = [];
-		currentCommandIndex = -1;
-		historyOffset = 0;
+		currentCommandNbr = -1;
+		commandHistoryOffset = 0;
 		redrawTrigger++;
 	}
 
@@ -252,8 +266,8 @@
 			{zoomIn}
 			{zoomOut}
 			{resetZoom}
-			{commandHistory}
-			{currentCommandIndex}
+			{canUndo}
+			{canRedo}
 			onUndo={undo}
 			onRedo={redo}
 		/>
@@ -262,8 +276,9 @@
 		</div>
 		<CommandHistoryBar 
 			{commandHistory} 
-			{currentCommandIndex}
+			{currentCommandNbr}
 			onCommandClick={handleCommandClick}
+			historyLimit={HISTORY_LIMIT}
 		/>
 	{/if}
 </main>

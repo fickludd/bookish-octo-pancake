@@ -5,7 +5,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { IconFolder, IconMinus, IconPlus, IconRefresh, IconArrowBackUp, IconArrowForwardUp } from '@tabler/icons-svelte';
   
-  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom, commandHistory, currentCommandIndex, onUndo, onRedo } = $props();
+  let { activeToolName, setActiveTool, tools, updateTool, layers, activeLayerId, onLayerSelect, onLayerAdd, onLayerDelete, onLayerVisibilityToggle, onLoadComplete, onCanvasSizeChange, zoom, zoomIn, zoomOut, resetZoom, canUndo, canRedo, onUndo, onRedo } = $props();
   
   let showFileMenu = $state(false);
   
@@ -164,18 +164,18 @@
     <button 
       class="tool-button" 
       on:click={onUndo} 
-      disabled={currentCommandIndex < 0}
+      disabled={canUndo == false}
       title="Undo (Ctrl+Z)"
     >
-      <IconArrowBackUp class="icon" stroke={2} color={currentCommandIndex < 0 ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
+      <IconArrowBackUp class="icon" stroke={2} color={canUndo == false ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
     </button>
     <button 
       class="tool-button" 
       on:click={onRedo} 
-      disabled={currentCommandIndex >= commandHistory.length - 1}
+      disabled={canRedo == false}
       title="Redo (Ctrl+Y)"
     >
-      <IconArrowForwardUp class="icon" stroke={2} color={currentCommandIndex >= commandHistory.length - 1 ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
+      <IconArrowForwardUp class="icon" stroke={2} color={canRedo == false ? 'var(--color-disabled)' : 'var(--color-text-secondary)'} />
     </button>
     <button class="tool-button" on:click={zoomOut} title="Zoom out (Ctrl + -)">
       <IconMinus class="icon" stroke={2} color="var(--color-text-secondary)" />

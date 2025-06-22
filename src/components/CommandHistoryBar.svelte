@@ -1,9 +1,7 @@
 <script>
     import { IconBrush, IconEraser } from '@tabler/icons-svelte';
     
-    export let commandHistory = [];
-    export let currentCommandIndex = -1;
-    export let onCommandClick = (index) => {};
+    let { commandHistory, currentCommandNbr, onCommandClick } = $props();
 
     function handleCommandClick(index) {
         onCommandClick(index);
@@ -18,9 +16,9 @@
     {#each commandHistory as command, index}
         <div 
             class="command-box" 
-            class:unapplied={index > currentCommandIndex}
-            on:click={() => handleCommandClick(index)}
-            title={`${command.label} on ${command.layer.name}${index > currentCommandIndex ? ' (not applied)' : ''}`}
+            class:unapplied={command.nbr > currentCommandNbr}
+            on:click={() => handleCommandClick(command.nbr)}
+            title={`${command.label} on ${command.layer.name}${command.nbr > currentCommandNbr ? ' (not applied)' : ''}`}
         >
             {#if command.tool}
                 {@const IconComponent = getIconComponent(command.tool.name)}
